@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { envConfig } from '../config';
-import { User } from '../models';
+import { initAdmin } from '../utils/db.util';
 
 export const connectDB = async () => {
   try {
@@ -8,26 +8,9 @@ export const connectDB = async () => {
     if (!mongoURI) {
       throw new Error('MONGO_URI is not defined in the environment variables');
     }
-
     await mongoose.connect(mongoURI, {});
-
     console.log('MongoDB connected successfully');
-    // Seed admin user
-    const adminEmail = envConfig.adminEmail;
-    const adminPassword = envConfig.adminPassword;
-
-    const adminExists = await User.findOne({ email: adminEmail });
-    if (!adminExists) {
-      await User.create({
-        name: 'Admin',
-        email: adminEmail,
-        password: adminPassword,
-        role: 'admin', // Add a role field to distinguish admin users
-      });
-      console.log(`Admin user created with email: ${adminEmail}`);
-    } else {
-      console.log('Admin user already exists');
-    }
+    initAdmin();
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
     process.exit(1); // Exit process with failure
