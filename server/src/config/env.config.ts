@@ -17,5 +17,5 @@ export const envConfig: Config = {
   mongoURI: process.env.MONGO_URI || 'mongodb://localhost:27017/myapp',
   adminEmail: process.env.ADMIN_EMAIL || 'admin@gmail.com',
   adminPassword: process.env.ADMIN_PASSWORD || 'admin123',
-  jwtSecret: process.env.JWT_SECRET || 'secret'
+  jwtSecret: process.env.JWT_SECRET || 'my@Secret'
 };

@@ -1,2 +1,2 @@
-export { loginController } from "./userController";
-export { adminTestController } from "./adminController";
+export { loginController } from './userController';
+export { adminTestController, adminLogoutController } from './adminController';

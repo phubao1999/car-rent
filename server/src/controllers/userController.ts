@@ -1,9 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import { User } from '../models';
+import { envConfig } from '../config';
 
 const generateToken = (id: string, role: string) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET || 'secret', {
+  return jwt.sign({ id, role }, envConfig.jwtSecret, {
     expiresIn: '30d',
   });
 };
