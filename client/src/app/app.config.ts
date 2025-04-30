@@ -4,21 +4,21 @@ import { provideRouter } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 
-import { routes } from './app.routes';
+import { routes } from './app-routing.module';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimationsAsync(),
     providePrimeNG({
-        theme: {
-            preset: Aura,
-            options: {
-              prefix: 'p',
-              darkModeSelector: 'system',
-              cssLayer: false
-          }
+      theme: {
+        preset: Aura,
+        options: {
+          prefix: 'p',
+          darkModeSelector: 'system',
+          cssLayer: false,
         },
-        ripple: true
+      },
+      ripple: true,
     }),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
