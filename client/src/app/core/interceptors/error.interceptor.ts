@@ -11,19 +11,16 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error) => {
       // Handle the error here
       if (error.status === 401 || error.status === 403) {
-        // Handle unauthorized access
         messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'Unauthorized access - redirecting to login',
         });
+        localStorage.removeItem('token');
         router.navigate(['']);
-        // Optionally, you can redirect to a login page or show a notification
       } else if (error.status === 404) {
-        // Handle not found
         console.error('Resource not found');
       } else {
-        // Handle other errors
         console.error('An error occurred:', error);
       }
       return throwError(() => error);
