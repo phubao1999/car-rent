@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { getAvailableCars } from '../controllers';
+import { createBooking, getAvailableCars } from '../controllers';
 
 export const carRouter = Router();
 
 carRouter.get('/available', getAvailableCars);
+carRouter.post('/book', createBooking);

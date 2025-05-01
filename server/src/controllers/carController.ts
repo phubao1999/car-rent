@@ -1,6 +1,74 @@
 import { Request, Response } from 'express';
 import { Booking, Car, ICar } from '../models';
 
+export const createBooking = async (req: Request, res: Response) => {
+  try {
+    const { name, email, drivingLicenseExpiry, carId, startDate, endDate } =
+      req.body;
+
+    if (
+      !name ||
+      !email ||
+      !drivingLicenseExpiry ||
+      !carId ||
+      !startDate ||
+      !endDate
+    ) {
+      res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (start > end) {
+      res.status(400).json({ message: 'Start date must be before end date.' });
+    }
+
+    // Validate driving license expiry
+    const licenseExpiry = new Date(drivingLicenseExpiry);
+    if (licenseExpiry < end) {
+      res.status(400).json({
+        message: 'Driving license must be valid through the booking period.',
+      });
+    }
+
+    // Check if the user already has a booking for the same dates
+    const overlappingBooking = await Booking.findOne({
+      email,
+      $or: [{ startDate: { $lte: end }, endDate: { $gte: start } }],
+    });
+    if (overlappingBooking) {
+      res
+        .status(400)
+        .json({ message: 'You already have a booking for these dates.' });
+    }
+
+    const car = await Car.findById(carId);
+    if (!car) {
+      res.status(404).json({ message: 'Car not found.' });
+    } else {
+      const totalPrice = calculateTotalPrice(car, start, end);
+      const booking = new Booking({
+        name,
+        email,
+        drivingLicenseExpiry: licenseExpiry,
+        carId,
+        startDate: start,
+        endDate: end,
+        totalPrice,
+      });
+      await booking.save();
+      res.status(201).json({
+        message: 'Booking created successfully.',
+        booking,
+      });
+    }
+  } catch (error) {
+    console.error('Error creating booking:', error);
+    res.status(500).json({ message: 'Failed to create booking.' });
+  }
+};
+
 export const getAvailableCars = async (req: Request, res: Response) => {
   try {
     const { startDate, endDate } = req.query;

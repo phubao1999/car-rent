@@ -7,4 +7,4 @@ export {
   updateCars,
   getCars,
 } from './adminController';
-export { getAvailableCars } from './carController';
+export { getAvailableCars, createBooking } from './carController';
