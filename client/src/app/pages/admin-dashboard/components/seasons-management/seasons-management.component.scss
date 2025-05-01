@@ -38,6 +38,11 @@
     }
   }
 }
+.action {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
 
 button[type="submit"] {
   margin-top: 20px;
@@ -47,7 +52,6 @@ button[type="submit"] {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  float: right;
 
   &:hover {
     background-color: #45a049;

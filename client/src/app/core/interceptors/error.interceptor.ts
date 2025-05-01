@@ -19,9 +19,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         localStorage.removeItem('token');
         router.navigate(['']);
       } else if (error.status === 404) {
-        console.error('Resource not found');
+        utilityService.showMessage('error', 'Error', 'Resource not found');
       } else {
-        console.error('An error occurred:', error);
+        utilityService.showMessage('error', 'Error', error.message);
       }
       return throwError(() => error);
     })

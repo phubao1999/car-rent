@@ -1,7 +1,13 @@
 import { envConfig } from '../config';
-import { Season, User } from '../models';
+import { Car, Season, User } from '../models';
 
-export const initAdmin = async () => {
+export const initDBCollections = async () => {
+  await initAdmin();
+  await initializeSeasons();
+  await initializeCars();
+};
+
+const initAdmin = async () => {
   const adminEmail = envConfig.adminEmail;
   const adminPassword = envConfig.adminPassword;
 
@@ -19,7 +25,7 @@ export const initAdmin = async () => {
   }
 };
 
-export const initializeSeasons = async () => {
+const initializeSeasons = async () => {
   const existingSeasons = await Season.find();
 
   if (existingSeasons.length === 0) {
@@ -65,5 +71,61 @@ export const initializeSeasons = async () => {
     console.log('Default seasons have been initialized.');
   } else {
     console.log('Seasons already exist in the database.');
+  }
+};
+
+const initializeCars = async () => {
+  const existingCars = await Car.find();
+
+  if (existingCars.length === 0) {
+    console.log('No cars found in the database. Initializing default cars...');
+
+    const cars = [
+      {
+        brand: 'Toyota',
+        model: 'Yaris',
+        stock: 3,
+        peakSeasonPrice: 98.43,
+        midSeasonPrice: 76.89,
+        offSeasonPrice: 53.65,
+      },
+      {
+        brand: 'Seat',
+        model: 'Ibiza',
+        stock: 5,
+        peakSeasonPrice: 85.12,
+        midSeasonPrice: 65.73,
+        offSeasonPrice: 46.85,
+      },
+      {
+        brand: 'Nissan',
+        model: 'Qashqai',
+        stock: 2,
+        peakSeasonPrice: 101.46,
+        midSeasonPrice: 82.94,
+        offSeasonPrice: 59.87,
+      },
+      {
+        brand: 'Jaguar',
+        model: 'e-pace',
+        stock: 1,
+        peakSeasonPrice: 120.54,
+        midSeasonPrice: 91.35,
+        offSeasonPrice: 70.27,
+      },
+      {
+        brand: 'Mercedes',
+        model: 'Vito',
+        stock: 2,
+        peakSeasonPrice: 109.16,
+        midSeasonPrice: 89.64,
+        offSeasonPrice: 64.97,
+      },
+    ];
+
+    await Car.insertMany(cars);
+    console.log('Default cars have been initialized.');
+  } else {
+    console.log('Cars already exist in the database.');
   }
 };
