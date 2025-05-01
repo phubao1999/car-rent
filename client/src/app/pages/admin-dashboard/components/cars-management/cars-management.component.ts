@@ -1,11 +1,11 @@
-import { UtilityService } from './../../../../utils/utility.service';
-import { TableModule } from 'primeng/table';
-import { Component, OnInit } from '@angular/core';
-import { CoreService } from '../../../../core/services/core.service';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
 import { ICar } from '../../../../core/models/car.interface';
+import { AdminService } from '../../admin.service';
+import { UtilityService } from './../../../../utils/utility.service';
 
 @Component({
   selector: 'app-cars-management',
@@ -20,8 +20,8 @@ export class CarsManagementComponent implements OnInit {
   disabledBtn: boolean = false;
 
   constructor(
-    private coreService: CoreService,
-    private utilityService: UtilityService
+    private utilityService: UtilityService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit(): void {
@@ -29,7 +29,7 @@ export class CarsManagementComponent implements OnInit {
   }
 
   getCars() {
-    this.coreService.getCars().subscribe((res) => {
+    this.adminService.getCars().subscribe((res) => {
       this.cars = res;
     });
   }
@@ -51,7 +51,7 @@ export class CarsManagementComponent implements OnInit {
 
   updateCars() {
     if (this.validateCars()) {
-      this.coreService.updateCars(this.cars).subscribe((res) => {
+      this.adminService.updateCars(this.cars).subscribe((res) => {
         this.utilityService.showMessage(
           'success',
           'Cars updated successfully',
