@@ -1,5 +1,5 @@
-import express from 'express';
 import cors from 'cors';
+import express from 'express';
 import { connectDB } from './db';
 import { errorHandler } from './middlewares';
 import { adminRouter, carRouter, userRouter } from './routes';
@@ -14,7 +14,7 @@ app.use(cors());
 // Routes
 app.use('/api/auth', userRouter);
 app.use('/api/admin', adminRouter);
-app.use('/api/car', carRouter);
+app.use('/api/cars', carRouter);
 
 app.use(errorHandler);
 

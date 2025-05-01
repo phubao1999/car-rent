@@ -4,5 +4,7 @@ export {
   adminLogoutController,
   getSeasonsController,
   updateSeasonsController,
+  updateCars,
+  getCars,
 } from './adminController';
-export { getCars, updateCars } from './carController';
+export { getAvailableCars } from './carController';

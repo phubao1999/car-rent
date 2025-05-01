@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Season } from '../models';
+import { Car, Season } from '../models';
 
 export const adminTestController = (req: Request, res: Response) => {
   res.status(200).json({
@@ -65,5 +65,35 @@ export const updateSeasonsController = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error updating seasons:', error);
     res.status(500).json({ message: 'Failed to update seasons.' });
+  }
+};
+
+export const getCars = async (req: Request, res: Response) => {
+  try {
+    const cars = await Car.find();
+    res.status(200).json(cars);
+  } catch (error) {
+    console.error('Error fetching cars:', error);
+    res.status(500).json({ message: 'Failed to fetch cars' });
+  }
+};
+
+export const updateCars = async (req: Request, res: Response) => {
+  try {
+    const carsToUpdate = req.body;
+
+    if (!Array.isArray(carsToUpdate)) {
+      res
+        .status(400)
+        .json({ message: 'Invalid data format. Expected an array of cars.' });
+    }
+
+    await Car.deleteMany({});
+    const updatedCars = await Car.insertMany(carsToUpdate);
+
+    res.status(200).json(updatedCars);
+  } catch (error) {
+    console.error('Error updating cars:', error);
+    res.status(500).json({ message: 'Failed to update cars' });
   }
 };

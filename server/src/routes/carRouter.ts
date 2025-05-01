@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { getCars, updateCars } from '../controllers';
+import { getAvailableCars } from '../controllers';
 
 export const carRouter = Router();
 
-carRouter.get('/', getCars);
-carRouter.put('/', updateCars);
+carRouter.get('/available', getAvailableCars);
