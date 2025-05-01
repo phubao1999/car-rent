@@ -4,4 +4,10 @@
   align-items: center;
   border-bottom: 1px solid;
   padding-bottom: 1rem;
+  .user-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
 }

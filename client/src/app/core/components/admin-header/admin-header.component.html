@@ -1,6 +1,8 @@
 <div class="header">
   <div class="logo">Car Renting Platform</div>
   <div class="user-info">
-    <p-button *ngIf="isLogin" label="Logout" (click)="onLogout()" />
+    <p-menu #menu [model]="items" [popup]="true" />
+    <p-button (click)="menu.toggle($event)" icon="pi pi-ellipsis-v" />
+    <!-- <p-button *ngIf="isLogin" label="Logout" (click)="onLogout()" /> -->
   </div>
 </div>

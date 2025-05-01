@@ -4,6 +4,7 @@ import { MainLayoutComponent } from './core/templates/main-layout/main-layout.co
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
 import { AdminLoginComponent } from './pages/admin-login/admin-login.component';
 import { adminGuard } from './core/auth/admin.guard';
+import { AdminHistoryComponent } from './pages/admin-history/admin-history.component';
 
 export const routes: Routes = [
   {
@@ -28,6 +29,10 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         component: AdminDashboardComponent,
+      },
+      {
+        path: 'car-rent-history',
+        component: AdminHistoryComponent,
       },
     ],
   },
