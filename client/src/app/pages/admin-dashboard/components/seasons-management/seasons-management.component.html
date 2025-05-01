@@ -1,0 +1,46 @@
+<h2>Car Renting Seasons</h2>
+<form [formGroup]="seasonsForm" (ngSubmit)="saveSeasons()">
+  <div *ngIf="seasonsForm.hasError('overlappingPeriods')" class="error">
+    Error: Some periods overlap within a season. Please fix them.
+  </div>
+  <div formArrayName="seasons">
+    <div
+      *ngFor="let season of seasons.controls; let i = index"
+      [formGroupName]="i"
+      class="season-group"
+    >
+      <h3>{{ season.get("name")?.value }}</h3>
+      <div formArrayName="periods" class="periods-container">
+        <div
+          *ngFor="let period of getPeriods(i).controls; let j = index"
+          [formGroupName]="j"
+          class="period-group"
+        >
+          <label>Start Date:</label>
+          <p-datepicker
+            formControlName="startDate"
+            [iconDisplay]="'input'"
+            [showIcon]="true"
+            inputId="icondisplay"
+          />
+          <label>End Date:</label>
+          <p-datepicker
+            formControlName="endDate"
+            [iconDisplay]="'input'"
+            [showIcon]="true"
+            inputId="icondisplay"
+          />
+          <button
+            type="button"
+            (click)="removePeriod(i, j)"
+            [disabled]="getPeriods(i).length === 1"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+      <button type="button" (click)="addPeriod(i)">Add Period</button>
+    </div>
+  </div>
+  <button type="submit">Save Seasons</button>
+</form>

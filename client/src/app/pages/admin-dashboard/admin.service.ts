@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { ISeasons } from '../../core/models';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class AdminService {
@@ -14,5 +16,13 @@ export class AdminService {
 
   logout() {
     return this.http.get(`${this.apiUrl}/logout`);
+  }
+
+  getSeasons(): Observable<ISeasons[]> {
+    return this.http.get<ISeasons[]>(`${this.apiUrl}/seasons`);
+  }
+
+  updateSeasons(seasons: ISeasons[]): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/seasons`, { seasons });
   }
 }

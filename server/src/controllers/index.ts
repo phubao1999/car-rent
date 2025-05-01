@@ -1,2 +1,2 @@
 export { loginController } from './userController';
-export { adminTestController, adminLogoutController } from './adminController';
+export { adminTestController, adminLogoutController, getSeasonsController, updateSeasonsController } from './adminController';

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { envConfig } from '../config';
-import { initAdmin } from '../utils/db.util';
+import { initAdmin, initializeSeasons } from '../utils/db.util';
 
 export const connectDB = async () => {
   try {
@@ -11,6 +11,7 @@ export const connectDB = async () => {
     await mongoose.connect(mongoURI, {});
     console.log('MongoDB connected successfully');
     initAdmin();
+    initializeSeasons();
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
     process.exit(1); // Exit process with failure
