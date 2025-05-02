@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ISeasons } from '../../core/models';
-import { Observable } from 'rxjs';
 import { ICar } from '../../core/models/car.interface';
 
 @Injectable()
@@ -33,5 +33,9 @@ export class AdminService {
 
   updateCars(cars: ICar[]): Observable<ICar[]> {
     return this.http.put<ICar[]>(`${this.apiUrl}/cars`, cars);
+  }
+
+  getBookings(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/bookings`);
   }
 }

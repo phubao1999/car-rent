@@ -35,7 +35,7 @@ export class AdminHeaderComponent {
           command: () => {
             this.onLogout();
           },
-          disabled: this.isLogin,
+          disabled: !this.isLogin,
         },
       ],
     },

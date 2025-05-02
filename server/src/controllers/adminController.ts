@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Car, Season } from '../models';
+import { Booking, Car, Season } from '../models';
 
 export const adminTestController = (req: Request, res: Response) => {
   res.status(200).json({
@@ -95,5 +95,15 @@ export const updateCars = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error updating cars:', error);
     res.status(500).json({ message: 'Failed to update cars' });
+  }
+};
+
+export const getBookings = async (req: Request, res: Response) => {
+  try {
+    const bookings = await Booking.find().populate('carId', 'brand model');
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    res.status(500).json({ message: 'Failed to fetch bookings' });
   }
 };
