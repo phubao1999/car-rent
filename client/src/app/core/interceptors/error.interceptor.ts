@@ -21,7 +21,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       } else if (error.status === 404) {
         utilityService.showMessage('error', 'Error', 'Resource not found');
       } else {
-        utilityService.showMessage('error', 'Error', error.message);
+        utilityService.showMessage('error', 'Error', error.error.message);
       }
       return throwError(() => error);
     })

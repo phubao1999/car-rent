@@ -1,23 +1,27 @@
-import { ICar } from '../models';
+import { ICar, ISeason, Season } from '../models';
 
-export const calculateTotalPrice = (
+export const calculateTotalPrice = async (
   car: ICar,
   startDate: Date,
   endDate: Date,
-): number => {
+): Promise<number> => {
   let totalPrice = 0;
   const currentDate = new Date(startDate);
+  const seasons = await Season.find();
 
   while (currentDate <= endDate) {
-    const month = currentDate.getMonth() + 1;
     let dailyPrice = car.offSeasonPrice;
-
-    if (month >= 6 && month <= 8) {
-      dailyPrice = car.peakSeasonPrice;
-    } else if (month === 5 || month === 9) {
-      dailyPrice = car.midSeasonPrice;
+    for (const season of seasons) {
+      for (const period of season.periods) {
+        const periodStart = new Date(period.startDate);
+        const periodEnd = new Date(period.endDate);
+        if (currentDate >= periodStart && currentDate <= periodEnd) {
+          dailyPrice =
+            car[(season as ISeason).code as keyof ICar] || car.offSeasonPrice;
+          break;
+        }
+      }
     }
-
     totalPrice += dailyPrice;
     currentDate.setDate(currentDate.getDate() + 1);
   }

@@ -17,6 +17,7 @@ import { StepperModule } from 'primeng/stepper';
 import { CoreService } from '../../core/services/core.service';
 import { UtilityService } from '../../utils/utility.service';
 import { IBookingRequest } from '../../core/models/booking.interface';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-booking',
@@ -44,12 +45,9 @@ export class BookingComponent {
   activeStep = 1;
   bookingForm!: FormGroup;
   paymentForm!: FormGroup;
-  couponCode = [
-    { name: 'WELCOME', discount: 5 },
-    { name: 'DISCOUNT10', discount: 10 },
-    { name: 'SUMMER20', discount: 20 },
-  ];
+  couponCodes = environment.couponCodes;
   discountApplied = false;
+  discountPrice: number = 0;
 
   get bookingPrice() {
     return {
@@ -86,14 +84,11 @@ export class BookingComponent {
       lastName: ['', Validators.required],
       creditCardNumber: [
         '',
-        [Validators.required, Validators.pattern(/^\d{16}$/)], // 16-digit card number
+        [Validators.required, Validators.pattern(/^\d{16}$/)],
       ],
-      securityCode: [
-        '',
-        [Validators.required, Validators.pattern(/^\d{3}$/)], // 3-digit CVC
-      ],
+      securityCode: ['', [Validators.required, Validators.pattern(/^\d{3}$/)]],
       cardExpiration: ['', Validators.required],
-      coupon: [''], // Optional coupon field
+      coupon: [''],
     });
   }
 
@@ -148,13 +143,26 @@ export class BookingComponent {
   }
 
   applyCoupon() {
-    // const enteredCoupon = this.paymentForm.get('coupon')?.value;
-    // if (enteredCoupon === this.couponCode) {
-    //   this.bookingPrice.totalPrice *= 0.9; // Apply a 10% discount
-    //   this.discountApplied = true;
-    // } else {
-    //   this.discountApplied = false;
-    // }
+    const enteredCoupon = this.paymentForm.get('coupon')?.value;
+    const couponCode = this.couponCodes.find(
+      (code) => code.name === enteredCoupon
+    );
+    if (couponCode) {
+      this.discountApplied = true;
+      this.discountPrice =
+        ((this.bookingPrice.totalPrice ?? 0) * (couponCode.discount ?? 0)) /
+        100;
+      this.updatePriceToBooking();
+    } else {
+      this.discountApplied = false;
+      this.discountPrice = 0;
+      this.updatePriceToBooking();
+      this.utilityService.showMessage(
+        'error',
+        'Invalid Coupon',
+        'The coupon code you entered is invalid.'
+      );
+    }
   }
 
   private checkValidLicenseDates(): boolean {
@@ -163,5 +171,14 @@ export class BookingComponent {
     return (
       expiry && bookingEndDate && new Date(expiry) > new Date(bookingEndDate)
     );
+  }
+
+  private updatePriceToBooking() {
+    const currentCarBooking = this.coreService.currentCarBooking();
+    if (currentCarBooking) {
+      currentCarBooking.totalPrice =
+        currentCarBooking.totalPrice - this.discountPrice;
+      this.coreService.updateCurrentCarBooking(currentCarBooking);
+    }
   }
 }

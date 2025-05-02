@@ -19,6 +19,9 @@
             >{{ bookingPrice.averagePrice | currency }}
           </p>
         </div>
+        <div *ngIf="discountApplied" class="info">
+          <p><strong>Discount Price:</strong>{{ discountPrice | currency }}</p>
+        </div>
         <div class="info">
           <p>
             <strong>Total Price:</strong
@@ -353,20 +356,11 @@
                   />
                   <button
                     pButton
-                    label="Apply Coupon"
+                    label="Verify and Apply Coupon"
                     icon="pi pi-tag"
                     class="p-button-sm p-button-secondary"
                     (click)="applyCoupon()"
                   ></button>
-                  <small *ngIf="discountApplied" class="p-success">
-                    Coupon applied! 10% discount applied.
-                  </small>
-                  <small
-                    *ngIf="!discountApplied && paymentForm.get('coupon')?.value"
-                    class="p-error"
-                  >
-                    Invalid coupon code.
-                  </small>
                 </div>
               </form>
             </div>

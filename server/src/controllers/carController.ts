@@ -2,11 +2,13 @@ import { Request, Response } from 'express';
 import { Booking, Car } from '../models';
 import { calculateTotalPrice } from '../utils/helper';
 
-export const createBooking = async (req: Request, res: Response) => {
+export const createBooking = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { name, email, drivingLicenseExpiry, carId, startDate, endDate } =
       req.body;
-
     if (
       !name ||
       !email ||
@@ -17,38 +19,34 @@ export const createBooking = async (req: Request, res: Response) => {
     ) {
       res.status(400).json({ message: 'All fields are required.' });
     }
-
     const start = new Date(startDate);
     const end = new Date(endDate);
-
     if (start > end) {
       res.status(400).json({ message: 'Start date must be before end date.' });
     }
-
-    // Validate driving license expiry
     const licenseExpiry = new Date(drivingLicenseExpiry);
     if (licenseExpiry < end) {
       res.status(400).json({
         message: 'Driving license must be valid through the booking period.',
       });
     }
-
-    // Check if the user already has a booking for the same dates
-    const overlappingBooking = await Booking.findOne({
-      email,
-      $or: [{ startDate: { $lte: end }, endDate: { $gte: start } }],
-    });
-    if (overlappingBooking) {
-      res
-        .status(400)
-        .json({ message: 'You already have a booking for these dates.' });
-    }
-
     const car = await Car.findById(carId);
     if (!car) {
       res.status(404).json({ message: 'Car not found.' });
     } else {
-      const totalPrice = calculateTotalPrice(car, start, end);
+      // Check for overlapping bookings for the same car
+      const overlappingBookings = await Booking.countDocuments({
+        carId,
+        $or: [{ startDate: { $lte: end }, endDate: { $gte: start } }],
+      });
+
+      if (overlappingBookings >= car.stock) {
+        res.status(400).json({
+          message: 'This car is fully booked for the selected dates.',
+        });
+      }
+
+      const totalPrice = await calculateTotalPrice(car, start, end);
       const booking = new Booking({
         name,
         email,
@@ -59,6 +57,8 @@ export const createBooking = async (req: Request, res: Response) => {
         totalPrice,
       });
       await booking.save();
+
+      // Send success response
       res.status(201).json({
         message: 'Booking created successfully.',
         booking,
@@ -102,7 +102,6 @@ export const getAvailableCars = async (req: Request, res: Response) => {
       },
     ]);
 
-    // Create a map of carId to bookingCount
     const bookingCounts = overlappingBookings.reduce(
       (acc, booking) => {
         acc[booking._id.toString()] = booking.bookingCount;
@@ -111,26 +110,38 @@ export const getAvailableCars = async (req: Request, res: Response) => {
       {} as Record<string, number>,
     );
 
-    // Find all cars and filter out those that are fully booked
+    // Find all cars and calculate remaining stock
     const cars = await Car.find();
-    const availableCars = cars.filter((car) => {
-      const bookedCount = bookingCounts[car._id.toString()] || 0;
-      return car.stock > bookedCount; // Only include cars with available stock
-    });
+    const availableCars = cars
+      .map((car) => {
+        const bookedCount = bookingCounts[car._id.toString()] || 0;
+        const remainingStock = car.stock - bookedCount;
+        if (remainingStock > 0) {
+          return {
+            ...car.toObject(),
+            remainingStock,
+          };
+        }
 
-    // Calculate total price and average daily price for each car
+        return null;
+      })
+      .filter((car) => car !== null);
+
     const days =
       Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    const carsWithPricing = availableCars.map((car) => {
-      const totalPrice = calculateTotalPrice(car, start, end);
-      const averagePrice = totalPrice / days;
+    const carsWithPricing = await Promise.all(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      availableCars.map(async (car: any) => {
+        const totalPrice = await calculateTotalPrice(car, start, end);
+        const averagePrice = totalPrice / days;
 
-      return {
-        ...car.toObject(),
-        totalPrice,
-        averagePrice,
-      };
-    });
+        return {
+          ...car,
+          totalPrice,
+          averagePrice,
+        };
+      }),
+    );
 
     res.status(200).json(carsWithPricing);
   } catch (error) {

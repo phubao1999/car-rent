@@ -8,6 +8,7 @@ const periodSchema: Schema = new Schema({
 
 export const seasonSchema: Schema = new Schema({
   name: { type: String, required: true, unique: true },
+  code: { type: String, required: true, unique: true },
   periods: { type: [periodSchema], required: true },
 });
 

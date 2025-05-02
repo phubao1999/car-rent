@@ -36,6 +36,7 @@ const initializeSeasons = async () => {
     const seasons = [
       {
         name: 'Peak Season',
+        code: 'peakSeasonPrice',
         periods: [
           {
             startDate: new Date('2025-06-01'),
@@ -45,6 +46,7 @@ const initializeSeasons = async () => {
       },
       {
         name: 'Mid Season',
+        code: 'midSeasonPrice',
         periods: [
           {
             startDate: new Date('2025-03-01'),
@@ -58,6 +60,7 @@ const initializeSeasons = async () => {
       },
       {
         name: 'Off Season',
+        code: 'offSeasonPrice',
         periods: [
           {
             startDate: new Date('2025-11-01'),

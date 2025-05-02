@@ -11,21 +11,8 @@ import { IBookingRequest } from '../models/booking.interface';
 export class CoreService {
   private baseURL = environment.apiUrl;
 
-  currentCarBooking = signal<ICarAvailable | null>({
-    _id: '6813448d4f309b3b0e1eb940',
-    brand: 'Toyota',
-    model: 'Yaris',
-    stock: 3,
-    peakSeasonPrice: 98.43,
-    midSeasonPrice: 76.89,
-    offSeasonPrice: 53.65,
-    totalPrice: 384.45,
-    averagePrice: 76.89,
-  });
-  period = signal<{ startDate: string; endDate: string } | null>({
-    startDate: '2025-05-02',
-    endDate: '2025-05-06',
-  });
+  currentCarBooking = signal<ICarAvailable | null>(null);
+  period = signal<{ startDate: string; endDate: string } | null>(null);
 
   constructor(private http: HttpClient) {}
 

@@ -7,5 +7,6 @@ export interface IPeriod {
 
 export interface ISeason extends Document {
   name: string;
+  code: string;
   periods: IPeriod[];
 }
