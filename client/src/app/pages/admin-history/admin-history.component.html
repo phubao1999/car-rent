@@ -1,7 +1,7 @@
 <div class="admin-dashboard">
   <h2>Booking Records</h2>
-
   <p-table
+    class="history-table"
     [value]="bookings"
     [tableStyle]="{ 'min-width': '60rem' }"
     [paginator]="true"
@@ -28,6 +28,9 @@
         <td>{{ booking.endDate | date : "yyyy-MM-dd" }}</td>
         <td>{{ booking.totalPrice | currency }}</td>
       </tr>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <div class="footer">Total Amount: {{ totalAmount | currency }}</div>
     </ng-template>
   </p-table>
 </div>

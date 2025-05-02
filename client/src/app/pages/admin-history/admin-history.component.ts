@@ -13,12 +13,17 @@ import { AdminService } from '../admin-dashboard/admin.service';
 })
 export class AdminHistoryComponent implements OnInit {
   bookings: any[] = [];
+  totalAmount: number = 0;
 
   constructor(private adminService: AdminService) {}
 
   ngOnInit(): void {
     this.adminService.getBookings().subscribe((res) => {
       this.bookings = res;
+      this.totalAmount = this.bookings.reduce(
+        (acc, booking) => acc + booking.totalPrice,
+        0
+      );
     });
   }
 }
