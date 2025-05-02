@@ -1,0 +1,392 @@
+<div class="booking-container">
+  <p-stepper [value]="activeStep" class="basis-[50rem]">
+    <p-step-list>
+      <p-step [value]="1">Collect Information</p-step>
+      <p-step [value]="2">Confirm Information</p-step>
+      <p-step [value]="3">Payment</p-step>
+    </p-step-list>
+    <div class="booking-price">
+      <p-card header="Booking Details">
+        <div class="info">
+          <p><strong>Brand:</strong>{{ bookingPrice.brand }}</p>
+        </div>
+        <div class="info">
+          <p><strong>Model:</strong>{{ bookingPrice.model }}</p>
+        </div>
+        <div class="info">
+          <p>
+            <strong>Average Price:</strong
+            >{{ bookingPrice.averagePrice | currency }}
+          </p>
+        </div>
+        <div class="info">
+          <p>
+            <strong>Total Price:</strong
+            >{{ bookingPrice.totalPrice | currency }}
+          </p>
+        </div>
+        <div class="info">
+          <p>
+            <strong>Period:</strong>{{ bookingPrice.startDate }} -
+            {{ bookingPrice.endDate }}
+          </p>
+        </div>
+      </p-card>
+    </div>
+
+    <p-step-panels>
+      <!-- Step 1: Collect Information -->
+      <p-step-panel [value]="1">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="flex flex-col h-48">
+            <div
+              class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium"
+            >
+              <form [formGroup]="bookingForm">
+                <div class="form-wrapper">
+                  <div class="form-group w-50">
+                    <label for="name">Name:</label>
+                    <input
+                      id="name"
+                      type="text"
+                      pInputText
+                      formControlName="name"
+                    />
+                    <small
+                      *ngIf="
+                        bookingForm.get('name')?.invalid &&
+                        bookingForm.get('name')?.touched
+                      "
+                      class="p-error"
+                    >
+                      Name is required.
+                    </small>
+                  </div>
+                  <div class="form-group w-50">
+                    <label for="email">Email:</label>
+                    <input
+                      id="email"
+                      type="email"
+                      pInputText
+                      formControlName="email"
+                    />
+                    <small
+                      *ngIf="
+                        bookingForm.get('email')?.invalid &&
+                        bookingForm.get('email')?.touched
+                      "
+                      class="p-error"
+                    >
+                      Valid email is required.
+                    </small>
+                  </div>
+                </div>
+                <div class="form-group w-50">
+                  <label for="dob">Date Of Birth:</label>
+                  <p-datepicker
+                    id="dob"
+                    class="custom-datepicker"
+                    formControlName="dob"
+                    dateFormat="yy-mm-dd"
+                    showIcon="true"
+                  ></p-datepicker>
+                  <small
+                    *ngIf="
+                      bookingForm.get('dob')?.invalid &&
+                      bookingForm.get('dob')?.touched
+                    "
+                    class="p-error"
+                  >
+                    Date of Birth is required.
+                  </small>
+                </div>
+                <div class="form-wrapper">
+                  <div class="form-group">
+                    <label for="drivingLicenseIssued"
+                      >Driving License Issued:</label
+                    >
+                    <p-datepicker
+                      id="drivingLicenseIssued"
+                      formControlName="drivingLicenseIssued"
+                      dateFormat="yy-mm-dd"
+                      showIcon="true"
+                    ></p-datepicker>
+                    <small
+                      *ngIf="
+                        bookingForm.get('drivingLicenseIssued')?.invalid &&
+                        bookingForm.get('drivingLicenseIssued')?.touched
+                      "
+                      class="p-error"
+                    >
+                      Driving License Issued Date is required.
+                    </small>
+                  </div>
+                  <div class="form-group">
+                    <label for="drivingLicenseExpiry"
+                      >Driving License Expiry:</label
+                    >
+                    <p-datepicker
+                      id="drivingLicenseExpiry"
+                      formControlName="drivingLicenseExpiry"
+                      dateFormat="yy-mm-dd"
+                      showIcon="true"
+                    ></p-datepicker>
+                    <small
+                      *ngIf="hasError('licenseIssuedAfterExpiry')"
+                      class="p-error"
+                    >
+                      Driving License Issued Date cannot be after or the same to
+                      Expiry Date.
+                    </small>
+                    <small
+                      *ngIf="
+                        bookingForm.get('drivingLicenseExpiry')?.invalid &&
+                        bookingForm.get('drivingLicenseExpiry')?.touched
+                      "
+                      class="p-error"
+                    >
+                      Driving License Expiry Date is required.
+                    </small>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="licenseNumber">License Number:</label>
+                  <input
+                    id="licenseNumber"
+                    type="text"
+                    pInputText
+                    formControlName="licenseNumber"
+                  />
+                  <small
+                    *ngIf="
+                      bookingForm.get('licenseNumber')?.invalid &&
+                      bookingForm.get('licenseNumber')?.touched
+                    "
+                    class="p-error"
+                  >
+                    License Number is required.
+                  </small>
+                </div>
+              </form>
+            </div>
+            <div class="flex pt-6 justify-end">
+              <p-button
+                label="Next"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                [disabled]="bookingForm.invalid"
+                (onClick)="nextStep(activateCallback)"
+              />
+            </div>
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- Step 2: Confirm Information -->
+      <p-step-panel [value]="2">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="booking-confirm">
+            <p-card header="Booking Information">
+              <div class="info">
+                <p><strong>Name:</strong>{{ bookingForm.value.name }}</p>
+              </div>
+              <div class="info">
+                <p><strong>Email:</strong>{{ bookingForm.value.email }}</p>
+              </div>
+              <div class="info">
+                <p>
+                  <strong>Date Of Birth:</strong>
+                  {{ bookingForm.value.dob | date : "yyyy-MM-dd" }}
+                </p>
+              </div>
+              <div class="info">
+                <p>
+                  <strong>Driving License Issued:</strong>
+                  {{
+                    bookingForm.value.drivingLicenseIssued | date : "yyyy-MM-dd"
+                  }}
+                </p>
+              </div>
+              <div class="info">
+                <p>
+                  <strong>Driving License Expiry:</strong>
+                  {{
+                    bookingForm.value.drivingLicenseExpiry | date : "yyyy-MM-dd"
+                  }}
+                </p>
+              </div>
+              <div class="info">
+                <p>
+                  <strong>License Number:</strong
+                  >{{ bookingForm.value.licenseNumber }}
+                </p>
+              </div>
+            </p-card>
+          </div>
+          <div class="flex pt-6 justify-between btn-group">
+            <p-button
+              label="Back"
+              severity="secondary"
+              icon="pi pi-arrow-left"
+              (onClick)="activateCallback(1)"
+            />
+            <p-button
+              label="Next"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              (onClick)="activateCallback(3)"
+            />
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- Step 3: Payment -->
+      <p-step-panel [value]="3">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="flex flex-col h-48">
+            <div
+              class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium"
+            >
+              <form [formGroup]="paymentForm">
+                <div class="form-wrapper">
+                  <div class="form-group w-50">
+                    <label for="firstName">First Name:</label>
+                    <input
+                      id="firstName"
+                      type="text"
+                      pInputText
+                      formControlName="firstName"
+                    />
+                    <small
+                      *ngIf="
+                        paymentForm.get('firstName')?.invalid &&
+                        paymentForm.get('firstName')?.touched
+                      "
+                      class="p-error"
+                    >
+                      First Name is required.
+                    </small>
+                  </div>
+                  <div class="form-group w-50">
+                    <label for="lastName">Last Name:</label>
+                    <input
+                      id="lastName"
+                      type="text"
+                      pInputText
+                      formControlName="lastName"
+                    />
+                    <small
+                      *ngIf="
+                        paymentForm.get('lastName')?.invalid &&
+                        paymentForm.get('lastName')?.touched
+                      "
+                      class="p-error"
+                    >
+                      Last Name is required.
+                    </small>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="creditCardNumber">Credit Card Number:</label>
+                  <input
+                    id="creditCardNumber"
+                    type="text"
+                    pInputText
+                    formControlName="creditCardNumber"
+                  />
+                  <small
+                    *ngIf="
+                      paymentForm.get('creditCardNumber')?.invalid &&
+                      paymentForm.get('creditCardNumber')?.touched
+                    "
+                    class="p-error"
+                  >
+                    Credit Card Number must be 16 digits.
+                  </small>
+                </div>
+                <div class="form-wrapper">
+                  <div class="form-group w-50">
+                    <label for="securityCode">Security Code (CVC):</label>
+                    <input
+                      id="securityCode"
+                      type="text"
+                      pInputText
+                      formControlName="securityCode"
+                    />
+                    <small
+                      *ngIf="
+                        paymentForm.get('securityCode')?.invalid &&
+                        paymentForm.get('securityCode')?.touched
+                      "
+                      class="p-error"
+                    >
+                      Security Code must be 3 digits.
+                    </small>
+                  </div>
+                  <div class="form-group w-50">
+                    <label for="cardExpiration">Card Expiration:</label>
+                    <p-datepicker
+                      id="cardExpiration"
+                      formControlName="cardExpiration"
+                      dateFormat="mm/yy"
+                      showIcon="true"
+                    ></p-datepicker>
+                    <small
+                      *ngIf="
+                        paymentForm.get('cardExpiration')?.invalid &&
+                        paymentForm.get('cardExpiration')?.touched
+                      "
+                      class="p-error"
+                    >
+                      Card Expiration is required.
+                    </small>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="coupon">Coupon (Optional):</label>
+                  <input
+                    id="coupon"
+                    type="text"
+                    pInputText
+                    formControlName="coupon"
+                  />
+                  <button
+                    pButton
+                    label="Apply Coupon"
+                    icon="pi pi-tag"
+                    class="p-button-sm p-button-secondary"
+                    (click)="applyCoupon()"
+                  ></button>
+                  <small *ngIf="discountApplied" class="p-success">
+                    Coupon applied! 10% discount applied.
+                  </small>
+                  <small
+                    *ngIf="!discountApplied && paymentForm.get('coupon')?.value"
+                    class="p-error"
+                  >
+                    Invalid coupon code.
+                  </small>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="flex pt-6 justify-start btn-group">
+            <p-button
+              label="Back"
+              icon="pi pi-arrow-left"
+              iconPos="right"
+              (onClick)="activateCallback(2)"
+            />
+            <p-button
+              label="Payment"
+              icon="pi pi-check"
+              class="p-button-success"
+              (onClick)="finishBooking()"
+            />
+          </div>
+        </ng-template>
+      </p-step-panel>
+    </p-step-panels>
+  </p-stepper>
+</div>

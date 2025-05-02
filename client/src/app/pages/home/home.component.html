@@ -4,20 +4,22 @@
   <!-- Search Bar -->
   <div class="search-bar">
     <label for="startDate">Start Date:</label>
-    <p-calendar
+    <p-datepicker
       id="startDate"
       [(ngModel)]="startDate"
+      [minDate]="today"
       dateFormat="yy-mm-dd"
       showIcon="true"
-    ></p-calendar>
+    ></p-datepicker>
 
     <label for="endDate">End Date:</label>
-    <p-calendar
+    <p-datepicker
       id="endDate"
       [(ngModel)]="endDate"
+      [minDate]="startDate"
       dateFormat="yy-mm-dd"
       showIcon="true"
-    ></p-calendar>
+    ></p-datepicker>
 
     <button
       pButton
@@ -38,7 +40,7 @@
   <!-- Available Cars List -->
   <div class="cars-list">
     <p-message
-      *ngIf="cars.length === 0 && !loading"
+      *ngIf="cars.length === 0 && !loading && count > 0"
       severity="warn"
       text="There is no available cars for today or this range date."
     ></p-message>

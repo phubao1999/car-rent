@@ -5,6 +5,8 @@ import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard
 import { AdminHistoryComponent } from './pages/admin-history/admin-history.component';
 import { AdminLoginComponent } from './pages/admin-login/admin-login.component';
 import { HomeComponent } from './pages/home/home.component';
+import { BookingComponent } from './pages/booking/booking.component';
+import { bookingGuard } from './core/auth/booking.guard';
 
 export const routes: Routes = [
   {
@@ -12,7 +14,12 @@ export const routes: Routes = [
     component: AdminLayoutComponent,
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'home', component: HomeComponent }
+      { path: 'home', component: HomeComponent },
+      {
+        path: 'booking',
+        component: BookingComponent,
+        canActivate: [bookingGuard],
+      },
     ],
   },
   {

@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { CalendarModule } from 'primeng/calendar';
+import { DatePickerModule } from 'primeng/datepicker';
 import { MessageModule } from 'primeng/message';
 import { TableModule } from 'primeng/table';
-import { CoreService } from '../../core/services/core.service';
-import { UtilityService } from '../../utils/utility.service';
 import { finalize } from 'rxjs';
 import { ICarAvailable } from '../../core/models/car.interface';
+import { CoreService } from '../../core/services/core.service';
+import { UtilityService } from '../../utils/utility.service';
 
 @Component({
   selector: 'app-home',
@@ -19,7 +20,7 @@ import { ICarAvailable } from '../../core/models/car.interface';
     TableModule,
     ButtonModule,
     MessageModule,
-    CalendarModule,
+    DatePickerModule,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -29,10 +30,13 @@ export class HomeComponent {
   endDate: Date | null = null;
   cars: ICarAvailable[] = [];
   loading: boolean = false;
+  today: Date = new Date();
+  count = 0;
 
   constructor(
     private coreService: CoreService,
-    private utilityService: UtilityService
+    private utilityService: UtilityService,
+    private router: Router
   ) {}
 
   searchCars() {
@@ -50,11 +54,11 @@ export class HomeComponent {
         .getCarsAvailable(startDateString, endDateString)
         .pipe(
           finalize(() => {
+            this.count++;
             this.loading = false;
           })
         )
         .subscribe((res) => {
-          console.log(res);
           this.cars = res;
         });
     }
@@ -68,7 +72,12 @@ export class HomeComponent {
   }
 
   bookCar(car: ICarAvailable) {
-    console.log(car);
+    this.coreService.updateCurrentCarBooking(car);
+    this.coreService.updatePeriod(
+      this.formatDate(this.startDate),
+      this.formatDate(this.endDate)
+    );
+    this.router.navigate(['/booking']);
   }
 
   private formatDate(date: Date | null): string {

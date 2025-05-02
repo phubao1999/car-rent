@@ -1,0 +1,71 @@
+.booking-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+
+  .booking-price {
+    margin: 1rem 0;
+  }
+
+  .steps {
+    margin-bottom: 20px;
+  }
+
+  .step-content {
+    margin-top: 20px;
+
+    .form-group {
+      margin-bottom: 15px;
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      input,
+      p-datepicker {
+        width: 100%;
+      }
+    }
+  }
+}
+
+small {
+  color: red;
+}
+
+.info {
+  p {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+.form-wrapper {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  &.w-50 {
+    width: 50%;
+  }
+}
+
+.custom-datepicker {
+  span {
+    width: 100%;
+  }
+}
+
+.btn-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
