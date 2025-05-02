@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   server:
+    container_name: car_booking_server
     build:
       context: ./server
       dockerfile: Dockerfile
@@ -14,6 +15,7 @@ services:
     command: npm start
 
   client:
+    container_name: car_booking_client
     build:
       context: ./client
       dockerfile: Dockerfile
@@ -21,5 +23,3 @@ services:
       - "80:80"
     depends_on:
       - server
-    volumes:
-      - ./client:/usr/share/nginx/html
