@@ -1,0 +1,84 @@
+<div class="home-container">
+  <h2>Search for Available Cars</h2>
+
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <label for="startDate">Start Date:</label>
+    <p-calendar
+      id="startDate"
+      [(ngModel)]="startDate"
+      dateFormat="yy-mm-dd"
+      showIcon="true"
+    ></p-calendar>
+
+    <label for="endDate">End Date:</label>
+    <p-calendar
+      id="endDate"
+      [(ngModel)]="endDate"
+      dateFormat="yy-mm-dd"
+      showIcon="true"
+    ></p-calendar>
+
+    <button
+      pButton
+      label="Search"
+      icon="pi pi-search"
+      class="p-button-outlined"
+      (click)="searchCars()"
+    ></button>
+    <button
+      pButton
+      label="Today"
+      icon="pi pi-calendar"
+      class="p-button-secondary"
+      (click)="setToday()"
+    ></button>
+  </div>
+
+  <!-- Available Cars List -->
+  <div class="cars-list">
+    <p-message
+      *ngIf="cars.length === 0 && !loading"
+      severity="warn"
+      text="There is no available cars for today or this range date."
+    ></p-message>
+
+    <p-message
+      *ngIf="loading"
+      severity="info"
+      text="Loading available cars..."
+    ></p-message>
+
+    <div *ngIf="cars.length > 0" class="cars-container">
+      <h3>Available Cars</h3>
+      <p-table [value]="cars" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Stock</th>
+            <th>Average Price</th>
+            <th>Action</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-car>
+          <tr>
+            <td>{{ car.brand }}</td>
+            <td>{{ car.model }}</td>
+            <td>{{ car.stock }}</td>
+            <td>{{ car.averagePrice | currency }}</td>
+            <td>
+              <button
+                pButton
+                label="Booking"
+                icon="pi pi-shopping-cart"
+                class="p-button-sm p-button-success"
+                (click)="bookCar(car)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

@@ -20,14 +20,14 @@ export class AdminHeaderComponent {
       label: 'Options',
       items: [
         {
-          label: 'Car Rent History',
-          icon: 'pi pi-fw pi-calendar',
-          routerLink: '/admin/car-rent-history',
-        },
-        {
           label: 'Dashboard',
           icon: 'pi pi-fw pi-chart-line',
           routerLink: '/admin/dashboard',
+        },
+        {
+          label: 'Car Booking History',
+          icon: 'pi pi-fw pi-calendar',
+          routerLink: '/admin/car-rent-history',
         },
         {
           label: 'Logout',
@@ -35,10 +35,15 @@ export class AdminHeaderComponent {
           command: () => {
             this.onLogout();
           },
+          disabled: this.isLogin,
         },
       ],
     },
   ];
+
+  get isAdminSection(): boolean {
+    return this.router.url.startsWith('/admin');
+  }
 
   get isLogin(): boolean {
     const token = localStorage.getItem('token');
@@ -46,6 +51,7 @@ export class AdminHeaderComponent {
   }
 
   constructor(private adminService: AdminService, private router: Router) {}
+
   onLogout() {
     if (this.isLogin) {
       this.adminService.logout().subscribe((res) => {

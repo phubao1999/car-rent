@@ -1,7 +1,13 @@
 <div class="header">
-  <div class="logo">Car Booking Management (Admin Section)</div>
+  <div class="logo">
+    {{
+      isAdminSection ? "Car Booking Management (Admin Section)" : "Car Booking"
+    }}
+  </div>
   <div class="user-info">
-    <p-menu #menu [model]="items" [popup]="true" />
-    <p-button (click)="menu.toggle($event)" icon="pi pi-ellipsis-v" />
+    <ng-container *ngIf="isAdminSection">
+      <p-menu #menu [model]="items" [popup]="true" />
+      <p-button (click)="menu.toggle($event)" icon="pi pi-ellipsis-v" />
+    </ng-container>
   </div>
 </div>
