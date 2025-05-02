@@ -1,1 +1,1 @@
-export { connectDB, disconnectDB } from './db';
+export { connectDB } from './db';

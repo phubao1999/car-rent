@@ -1,5 +1,26 @@
+import mongoose from 'mongoose';
 import { envConfig } from '../config';
 import { Car, Season, User } from '../models';
+
+export const connectDBForUT = async () => {
+  try {
+    const mongoURI = envConfig.mongoURI;
+    await mongoose.connect(mongoURI, {});
+    console.log('MongoDB connected successfully');
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+    process.exit(1); // Exit process with failure
+  }
+};
+
+export const disconnectDB = async () => {
+  try {
+    await mongoose.connection.close();
+    console.log('MongoDB disconnected successfully');
+  } catch (error) {
+    console.error('Error disconnecting from MongoDB:', error);
+  }
+};
 
 export const initDBCollections = async () => {
   await initAdmin();
