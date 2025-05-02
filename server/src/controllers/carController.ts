@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { Booking, Car, ICar } from '../models';
+import { Booking, Car } from '../models';
+import { calculateTotalPrice } from '../utils/helper';
 
 export const createBooking = async (req: Request, res: Response) => {
   try {
@@ -87,17 +88,34 @@ export const getAvailableCars = async (req: Request, res: Response) => {
     }
 
     // Find all bookings that overlap with the given time slot
-    const overlappingBookings = await Booking.find({
-      $or: [{ startDate: { $lte: end }, endDate: { $gte: start } }],
-    }).select('carId');
+    const overlappingBookings = await Booking.aggregate([
+      {
+        $match: {
+          $or: [{ startDate: { $lte: end }, endDate: { $gte: start } }],
+        },
+      },
+      {
+        $group: {
+          _id: '$carId',
+          bookingCount: { $sum: 1 },
+        },
+      },
+    ]);
 
-    const bookedCarIds = overlappingBookings.map((booking) =>
-      booking.carId.toString(),
+    // Create a map of carId to bookingCount
+    const bookingCounts = overlappingBookings.reduce(
+      (acc, booking) => {
+        acc[booking._id.toString()] = booking.bookingCount;
+        return acc;
+      },
+      {} as Record<string, number>,
     );
 
-    // Find all cars that are not booked during the time slot
-    const availableCars = await Car.find({
-      _id: { $nin: bookedCarIds },
+    // Find all cars and filter out those that are fully booked
+    const cars = await Car.find();
+    const availableCars = cars.filter((car) => {
+      const bookedCount = bookingCounts[car._id.toString()] || 0;
+      return car.stock > bookedCount; // Only include cars with available stock
     });
 
     // Calculate total price and average daily price for each car
@@ -119,29 +137,4 @@ export const getAvailableCars = async (req: Request, res: Response) => {
     console.error('Error fetching available cars:', error);
     res.status(500).json({ message: 'Failed to fetch available cars.' });
   }
-};
-
-const calculateTotalPrice = (
-  car: ICar,
-  startDate: Date,
-  endDate: Date,
-): number => {
-  let totalPrice = 0;
-  const currentDate = new Date(startDate);
-
-  while (currentDate <= endDate) {
-    const month = currentDate.getMonth() + 1;
-    let dailyPrice = car.offSeasonPrice;
-
-    if (month >= 6 && month <= 8) {
-      dailyPrice = car.peakSeasonPrice;
-    } else if (month === 5 || month === 9) {
-      dailyPrice = car.midSeasonPrice;
-    }
-
-    totalPrice += dailyPrice;
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-
-  return totalPrice;
 };
