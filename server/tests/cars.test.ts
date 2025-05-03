@@ -1,12 +1,13 @@
 import request from 'supertest';
 import app from '../src/app';
-import { BookingRepository, CarRepository } from '../src/repositories';
 import { connectDBForUT, disconnectDB } from '../src/utils/db.util';
+import {
+  findAllMock,
+  findOverlappingBookingsMock,
+} from './__mocks__/repositories';
 
 jest.mock('../src/models', () => ({
-  Booking: {
-    aggregate: jest.fn(),
-  },
+  Booking: { aggregate: jest.fn() },
   Car: {
     find: jest.fn().mockResolvedValue([]),
     insertMany: jest.fn(),
@@ -16,21 +17,63 @@ jest.mock('../src/models', () => ({
     create: jest.fn(),
   },
   Season: {
-    find: jest.fn().mockResolvedValue([]),
-    insertMany: jest.fn(),
+    find: jest.fn().mockResolvedValue([
+      {
+        name: 'Peak Season',
+        code: 'peakSeasonPrice',
+        periods: [
+          {
+            startDate: {
+              $date: '2025-06-01T00:00:00.000Z',
+            },
+            endDate: {
+              $date: '2025-09-15T00:00:00.000Z',
+            },
+          },
+        ],
+      },
+      {
+        name: 'Mid Season',
+        code: 'midSeasonPrice',
+        periods: [
+          {
+            startDate: {
+              $date: '2025-03-01T00:00:00.000Z',
+            },
+            endDate: {
+              $date: '2025-06-01T00:00:00.000Z',
+            },
+          },
+          {
+            startDate: {
+              $date: '2025-09-15T00:00:00.000Z',
+            },
+            endDate: {
+              $date: '2025-10-31T00:00:00.000Z',
+            },
+          },
+        ],
+      },
+      {
+        name: 'Off Season',
+        code: 'offSeasonPrice',
+        periods: [
+          {
+            startDate: {
+              $date: '2025-11-01T00:00:00.000Z',
+            },
+            endDate: {
+              $date: '2026-03-01T00:00:00.000Z',
+            },
+          },
+        ],
+      },
+    ]),
   },
 }));
 
-jest.mock('../src/repositories', () => {
-  return {
-    BookingRepository: jest.fn().mockImplementation(() => ({
-      findOverlappingBookings: jest.fn(),
-    })),
-    CarRepository: jest.fn().mockImplementation(() => ({
-      findAll: jest.fn(),
-    })),
-  };
-});
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+jest.mock('../src/repositories', () => require('./__mocks__/repositories'));
 
 beforeAll(async () => {
   await connectDBForUT();
@@ -40,30 +83,32 @@ afterAll(async () => {
   await disconnectDB();
 });
 
-describe('GET Car Available', () => {
-  let bookingRepositoryInstance: BookingRepository;
-  let carRepositoryInstance: CarRepository;
-  beforeEach(() => {
-    bookingRepositoryInstance = new BookingRepository();
-    carRepositoryInstance = new CarRepository();
-  });
-  it('should return a list of available cars with remaining stock and pricing', async () => {
-    (
-      bookingRepositoryInstance.findOverlappingBookings as jest.Mock
-    ).mockResolvedValue([{ _id: 'car123', bookingCount: 2 }]);
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
-    (carRepositoryInstance.findAll as jest.Mock).mockResolvedValue([
+describe('GET Car Available', () => {
+  it('should return a list of available cars with remaining stock and pricing', async () => {
+    findOverlappingBookingsMock.mockResolvedValue([
+      { _id: 'car123', bookingCount: 2 },
+    ]);
+    findAllMock.mockResolvedValue([
       {
         _id: 'car123',
         brand: 'Toyota',
         model: 'Corolla',
         stock: 5,
         offSeasonPrice: 100,
+        midSeasonPrice: 110,
+        peakSeasonPrice: 120,
         toObject: jest.fn().mockReturnValue({
           _id: 'car123',
           brand: 'Toyota',
           model: 'Corolla',
           stock: 5,
+          offSeasonPrice: 100,
+          midSeasonPrice: 110,
+          peakSeasonPrice: 120,
         }),
       },
     ]);
@@ -76,16 +121,18 @@ describe('GET Car Available', () => {
     expect(response.body).toEqual([
       expect.objectContaining({
         _id: 'car123',
+        averagePrice: 100,
         brand: 'Toyota',
+        midSeasonPrice: 110,
         model: 'Corolla',
-        stock: 5,
+        offSeasonPrice: 100,
+        peakSeasonPrice: 120,
         remainingStock: 3,
-        totalPrice: expect.any(Number),
-        averagePrice: expect.any(Number),
+        stock: 5,
+        totalPrice: 500,
       }),
     ]);
   });
-
   it('should return 400 if startDate or endDate is missing', async () => {
     const response = await request(app).get('/api/cars/available').query({});
 
@@ -94,7 +141,6 @@ describe('GET Car Available', () => {
       message: 'Start date and end date are required.',
     });
   });
-
   it('should return 400 if startDate is after endDate', async () => {
     const response = await request(app)
       .get('/api/cars/available')
@@ -107,9 +153,7 @@ describe('GET Car Available', () => {
   });
 
   it('should return 500 if an error occurs', async () => {
-    (carRepositoryInstance.findAll as jest.Mock).mockRejectedValue(
-      new Error('Database error'),
-    );
+    findAllMock.mockRejectedValue(new Error('Database Error'));
 
     const response = await request(app)
       .get('/api/cars/available')

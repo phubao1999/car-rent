@@ -36,11 +36,13 @@ export const createBooking = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error creating booking:', error);
     if (isApiResponse(error)) {
-      const status = error.status || 500;
-      const message = error.message || 'Failed to create booking.';
+      const status = error.status;
+      const message = error.message;
       return res.status(status).json({ message });
     } else {
-      return res.json(error);
+      return res.status(500).json({
+        message: 'Failed to create booking.',
+      });
     }
   }
 };
