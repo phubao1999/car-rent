@@ -1,5 +1,10 @@
 import { ICar, ISeason, Season } from '../models';
 
+type ApiResponse = {
+  status: number;
+  message: string;
+};
+
 export const calculateTotalPrice = async (
   car: ICar,
   startDate: Date,
@@ -27,4 +32,15 @@ export const calculateTotalPrice = async (
   }
 
   return totalPrice;
+};
+
+export const isApiResponse = (obj: unknown): obj is ApiResponse => {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'status' in obj &&
+    'message' in obj &&
+    typeof obj.status === 'number' &&
+    typeof obj.message === 'string'
+  );
 };
