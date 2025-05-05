@@ -1,34 +1,16 @@
 import { Request, Response } from 'express';
 import { BookingService, CarService } from '../services';
-import { isApiResponse } from '../utils/helper';
+import { createBookingValidate, isApiResponse } from '../utils/helper';
 
 const carService = new CarService();
 const bookingService = new BookingService();
 
 export const createBooking = async (req: Request, res: Response) => {
   try {
-    const { name, email, drivingLicenseExpiry, carId, startDate, endDate } =
-      req.body;
-    if (
-      !name ||
-      !email ||
-      !drivingLicenseExpiry ||
-      !carId ||
-      !startDate ||
-      !endDate
-    ) {
+    if (!createBookingValidate(req)) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
-
-    const booking = await bookingService.createBooking({
-      name,
-      email,
-      drivingLicenseExpiry,
-      carId,
-      startDate,
-      endDate,
-    });
-
+    const booking = await bookingService.createBooking(req.body);
     return res.status(201).json({
       message: 'Booking created successfully.',
       booking,

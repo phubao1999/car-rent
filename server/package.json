@@ -4,7 +4,7 @@
   "description": "Server BE For Car Rent Application",
   "main": "index.js",
   "scripts": {
-    "start": "npm run build && rm -rf dist/tests && node dist/src/server.js",
+    "start": "npm run build && rm -rf dist/tests && node dist/src/index.js",
     "dev": "nodemon",
     "build": "rimraf ./dist && tsc",
     "lint": "eslint 'src/**/*.ts'",

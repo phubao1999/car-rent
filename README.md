@@ -68,10 +68,12 @@ The `getAvailableCars` function is responsible for fetching available cars based
 ## Note:
 
 - Because I don't have much time for this application. So i just add authentication for admin site only. Any other user will be define as anonymous user. It mean that user can book a car without register, just submit a information form and payment form (Payment form just a sample form) and can book a car
+- There maybe causing a few bugs in application because not much time for testing, but I want to focus to the main function which is: "Create Booking" and "Get Available Cars in Period". So please forgive me if you see some things bad on this test.
 
 ## Things to improve:
 
 - Make Base Request and Base Response for easier to handle incoming request and handle response in communicate between FE and BE.
+- Better validate input, request, token,... strategies even create some directives in FE for better UX. I'm not focus on this part, but if I have a chance, I will.
 - More Unit Test to coverage application.
 - For now, in client (FE), Almost component is standalone. Because of that, when building FE application causing high amount of bundle (1.28Mb). Need to re-architect module and reduce of standalone components to reduce bundle size
 

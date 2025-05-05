@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import { ICar, ISeason, Season } from '../models';
 
 type ApiResponse = {
@@ -43,4 +44,20 @@ export const isApiResponse = (obj: unknown): obj is ApiResponse => {
     typeof obj.status === 'number' &&
     typeof obj.message === 'string'
   );
+};
+
+export const createBookingValidate = (req: Request): boolean => {
+  const { name, email, drivingLicenseExpiry, carId, startDate, endDate } =
+    req.body;
+  if (
+    !name ||
+    !email ||
+    !drivingLicenseExpiry ||
+    !carId ||
+    !startDate ||
+    !endDate
+  ) {
+    return false;
+  }
+  return true;
 };
