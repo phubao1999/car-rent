@@ -16,6 +16,46 @@ This app is written by **Typescript** and follows **SOLID principles**, **Hexago
 - **Database Integration**: MongoDB for data persistence.
 - **Test Coverage**: Unit tests with Jest.
 
+## SOLID principles, Hexagonal Architecture, Repository Pattern and incorporates Design Patterns
+
+The `createBooking` function is responsible for handling booking creation. It integrates the following principles:
+
+- **SOLID Principles**:
+
+  - **Single Responsibility Principle (SRP)**: The `createBooking` function in the controller only handles HTTP request validation and response formatting. The actual booking logic is delegated to the `BookingService`.
+  - **Dependency Inversion Principle (DIP)**: The `BookingService` depends on an abstraction (`BookingRepository`) rather than a concrete implementation, making it easier to swap out the data source.
+
+- **Hexagonal Architecture**:
+
+  - The `BookingService` contains the core business logic for creating bookings, while the `BookingRepository` handles data persistence. This ensures that the business logic is independent of the database.
+
+- **Repository Pattern**:
+
+  - The `BookingRepository` abstracts the database operations (e.g., creating a booking), allowing the service layer to remain agnostic of the underlying data source.
+
+- **Design Patterns**:
+  - **Dependency Injection**: The `BookingService` receives the `BookingRepository` as a dependency, making it easier to mock during testing.
+
+The `getAvailableCars` function is responsible for fetching available cars based on a date range. It integrates the following principles:
+
+- **SOLID Principles**:
+
+  - **Single Responsibility Principle (SRP)**: The `getAvailableCars` function in the controller only validates the request and formats the response. The business logic for fetching available cars is handled by the `CarService`.
+  - **Open/Closed Principle (OCP)**: The `CarService` is open for extension (e.g., adding new pricing rules) but closed for modification, as the logic is encapsulated in reusable methods.
+  - **Dependency Inversion Principle (DIP)**: The `CarService` depends on abstractions (`CarRepository` and `BookingRepository`) rather than concrete implementations.
+
+- **Hexagonal Architecture**:
+
+  - The `CarService` contains the core business logic for calculating available cars and pricing. It interacts with the `CarRepository` and `BookingRepository` to fetch data, ensuring the business logic is decoupled from the database.
+
+- **Repository Pattern**:
+
+  - The `CarRepository` abstracts the database operations for fetching car data, while the `BookingRepository` handles booking-related queries. This separation makes the code more modular and testable.
+
+- **Design Patterns**:
+  - **Dependency Injection**: The `CarService` receives `CarRepository` and `BookingRepository` as dependencies, making it easier to test and mock.
+  - **Factory Pattern**: The `CarService` uses helper functions like `calculateTotalPrice` to encapsulate pricing logic, which can be extended or replaced without modifying the service.
+
 ## Extra Features
 
 - **Admin Management**:
@@ -41,7 +81,6 @@ This app is written by **Typescript** and follows **SOLID principles**, **Hexago
 
 - [Getting Started](#getting-started)
 - [Testing](#testing)
-- [Project Structure](#project-structure)
 
 ---
 
@@ -53,6 +92,11 @@ This app is written by **Typescript** and follows **SOLID principles**, **Hexago
 - **npm** (v7 or higher)
 - **MongoDB** (local or cloud instance)
 - **Docker Engine** (Optional)
+
+### Run By Docker (Optional)
+
+go to the root folder and run "docker-compose up -d"
+then open browser and access http://localhost
 
 ### Installation
 
@@ -73,15 +117,17 @@ This app is written by **Typescript** and follows **SOLID principles**, **Hexago
    ```
 
    For Database, I have already create an instance in https://cloud.mongodb.com/. But if you want your own DB, you can create one.
+   For Env file, The content will be look like this:
+   PORT=yourPort
+   NODE_ENV=development || Production || Whatever environment
+   MONGO_URI=connectURI
+   ADMIN_EMAIL=yourmail@gmail.com
+   ADMIN_PASSWORD=yourPassword
+   JWT_SECRECT=yourSecret
 
 4. Access the app:
    Frontend: http://localhost:4200
    Backend: http://localhost:3000
-
-### Run By Docker (Optional)
-
-go to the root folder and run "docker-compose up -d"
-then open browser and access http://localhost
 
 ---
 
@@ -100,200 +146,3 @@ To run test:
    `npm test -t "should return 400 if startDate or endDate is missing"`
 
 ---
-
-## Project Structure
-
-### FrontEnd
-
-```
-└── 📁client
-    └── 📁public
-        └── favicon.ico
-    └── 📁src
-        └── 📁app
-            └── app-routing.module.ts
-            └── app.component.html
-            └── app.component.scss
-            └── app.component.spec.ts
-            └── app.component.ts
-            └── app.config.ts
-            └── 📁core
-                └── 📁auth # Handle Authentication and Authorization
-                    └── admin.guard.spec.ts
-                    └── admin.guard.ts
-                    └── booking.guard.spec.ts
-                    └── booking.guard.ts
-                └── 📁components # Core Components
-                    └── 📁admin-header
-                        └── admin-header.component.html
-                        └── admin-header.component.scss
-                        └── admin-header.component.spec.ts
-                        └── admin-header.component.ts
-                    └── 📁footer
-                        └── footer.component.html
-                        └── footer.component.scss
-                        └── footer.component.spec.ts
-                        └── footer.component.ts
-                    └── 📁loading
-                        └── loading.component.html
-                        └── loading.component.scss
-                        └── loading.component.spec.ts
-                        └── loading.component.ts
-                    └── 📁main-header
-                        └── main-header.component.html
-                        └── main-header.component.scss
-                        └── main-header.component.spec.ts
-                        └── main-header.component.ts
-                └── 📁directives
-                └── 📁interceptors # Interceptors
-                    └── error.interceptor.spec.ts
-                    └── error.interceptor.ts
-                    └── token.interceptor.spec.ts
-                    └── token.interceptor.ts
-                └── 📁models # Models for FE
-                    └── admin.interface.ts
-                    └── booking.interface.ts
-                    └── car.interface.ts
-                    └── index.ts
-                    └── seasons.interface.ts
-                └── 📁services # Core Services
-                    └── core.service.spec.ts
-                    └── core.service.ts
-                └── 📁templates
-                    └── 📁admin-layout
-                        └── admin-layout.component.html
-                        └── admin-layout.component.scss
-                        └── admin-layout.component.spec.ts
-                        └── admin-layout.component.ts
-            └── 📁pages # Pages Components
-                └── 📁admin-dashboard
-                    └── admin-dashboard.component.html
-                    └── admin-dashboard.component.scss
-                    └── admin-dashboard.component.spec.ts
-                    └── admin-dashboard.component.ts
-                    └── admin.service.spec.ts
-                    └── admin.service.ts
-                    └── 📁components
-                        └── 📁cars-management
-                            └── cars-management.component.html
-                            └── cars-management.component.scss
-                            └── cars-management.component.spec.ts
-                            └── cars-management.component.ts
-                        └── 📁seasons-management
-                            └── seasons-management.component.html
-                            └── seasons-management.component.scss
-                            └── seasons-management.component.spec.ts
-                            └── seasons-management.component.ts
-                └── 📁admin-history
-                    └── admin-history.component.html
-                    └── admin-history.component.scss
-                    └── admin-history.component.spec.ts
-                    └── admin-history.component.ts
-                └── 📁admin-login
-                    └── admin-auth.service.spec.ts
-                    └── admin-auth.service.ts
-                    └── admin-login.component.html
-                    └── admin-login.component.scss
-                    └── admin-login.component.spec.ts
-                    └── admin-login.component.ts
-                └── 📁booking
-                    └── booking.component.html
-                    └── booking.component.scss
-                    └── booking.component.spec.ts
-                    └── booking.component.ts
-                └── 📁home
-                    └── home.component.html
-                    └── home.component.scss
-                    └── home.component.spec.ts
-                    └── home.component.ts
-            └── 📁utils # Utils Function
-                └── utility.service.spec.ts
-                └── utility.service.ts
-        └── 📁environments
-            └── environment.prod.ts
-            └── environment.ts
-        └── index.html
-        └── main.ts
-        └── styles.scss
-    └── .dockerignore
-    └── .editorconfig
-    └── .gitignore
-    └── angular.json
-    └── Dockerfile
-    └── nginx.conf
-    └── package-lock.json
-    └── package.json
-    └── README.md
-    └── tsconfig.app.json
-    └── tsconfig.json
-    └── tsconfig.spec.json
-```
-
-### Backend
-
-```
-└── 📁server
-    └── 📁logs # Logging File
-        └── combined.log
-        └── error.log
-    └── 📁src
-        └── app.ts
-        └── 📁config # Config Application
-            └── env.config.ts
-            └── index.ts
-        └── 📁controllers # Controller of Application
-            └── adminController.ts
-            └── carController.ts
-            └── index.ts
-            └── userController.ts
-        └── 📁db # Database of Application
-            └── db.ts
-            └── index.ts
-        └── 📁middlewares # Middlewares
-            └── authHandler.ts
-            └── errorHandler.ts
-            └── index.ts
-        └── 📁models # Models
-            └── index.ts
-            └── 📁interface
-                └── booking.interface.ts
-                └── car.interface.ts
-                └── season.interface.ts
-                └── user.interface.ts
-            └── 📁schema
-                └── booking.schema.ts
-                └── car.schema.ts
-                └── season.schema.ts
-                └── user.schema.ts
-        └── 📁repositories # DB Repositories
-            └── booking.repository.ts
-            └── car.repository.ts
-            └── index.ts
-        └── 📁routes # App Router
-            └── adminRouter.ts
-            └── carRouter.ts
-            └── index.ts
-            └── userRouter.ts
-        └── server.ts # Application index
-        └── 📁services # Service / Business Logic
-            └── booking.service.ts
-            └── car.service.ts
-            └── index.ts
-        └── 📁utils # Utils Function
-            └── db.util.ts
-            └── helper.ts
-            └── logger.util.ts
-    └── 📁tests # Testing
-        └── cars.test.ts
-    └── .dockerignore
-    └── .env
-    └── .gitignore
-    └── .prettierrc
-    └── Dockerfile
-    └── eslint.config.js
-    └── jest.config.js
-    └── nodemon.json
-    └── package-lock.json
-    └── package.json
-    └── tsconfig.json
-```
