@@ -6,6 +6,11 @@ import {
   countOverlappingBookingsMock,
   createMock,
 } from './__mocks__/repositories';
+import {
+  MESSAGES,
+  MESSAGES_ERROR,
+  MESSAGES_ERROR_VALIDATED,
+} from '../src/constant';
 
 jest.mock('../src/models', () => ({
   Booking: {
@@ -107,7 +112,7 @@ describe('POST Booking', () => {
     });
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      message: 'Start date must be before end date.',
+      message: MESSAGES_ERROR_VALIDATED.PERIOD_INVALID,
     });
   });
   it('should return 400 if driving license expire before booking date', async () => {
@@ -121,7 +126,7 @@ describe('POST Booking', () => {
     });
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      message: 'Driving license must be valid through the booking period.',
+      message: MESSAGES_ERROR_VALIDATED.BOOKING_LICENSE_EXPIRY,
     });
   });
   it('should return 404 if can not find a car', async () => {
@@ -136,7 +141,7 @@ describe('POST Booking', () => {
     });
     expect(response.status).toBe(404);
     expect(response.body).toEqual({
-      message: 'Car not found.',
+      message: MESSAGES_ERROR.CAR_NOT_FOUND,
     });
   });
   it('should return 400 if remaining car is 0', async () => {
@@ -160,7 +165,7 @@ describe('POST Booking', () => {
     });
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      message: 'This car is fully booked for the selected dates.',
+      message: MESSAGES_ERROR.OVER_LAPPING_BOOKING,
     });
   });
   it('should return 500 if an error occurs', async () => {
@@ -175,7 +180,7 @@ describe('POST Booking', () => {
     });
     expect(response.status).toBe(500);
     expect(response.body).toEqual({
-      message: 'Failed to create booking.',
+      message: MESSAGES_ERROR.BOOKING_FAILED,
     });
   });
   it('should return a booking after booking request successfully', async () => {
@@ -209,7 +214,7 @@ describe('POST Booking', () => {
     expect(response.status).toBe(201);
     expect(response.body).toEqual(
       expect.objectContaining({
-        message: 'Booking created successfully.',
+        message: MESSAGES.BOOKING_CREATED,
         booking: mockData,
       }),
     );

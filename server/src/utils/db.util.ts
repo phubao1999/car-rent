@@ -1,14 +1,16 @@
 import mongoose from 'mongoose';
 import { envConfig } from '../config';
 import { Car, Season, User } from '../models';
+import { MESSAGES, MESSAGES_INFO } from '../constant';
+import { logger } from './logger.util';
 
 export const connectDBForUT = async () => {
   try {
     const mongoURI = envConfig.mongoURI;
     await mongoose.connect(mongoURI, {});
-    console.log('MongoDB connected successfully');
+    console.log(MESSAGES.DB_CONNECTED);
   } catch (error) {
-    console.error('Error connecting to MongoDB:', error);
+    logger.error('Error connecting to MongoDB:', error);
     process.exit(1); // Exit process with failure
   }
 };
@@ -16,9 +18,9 @@ export const connectDBForUT = async () => {
 export const disconnectDB = async () => {
   try {
     await mongoose.connection.close();
-    console.log('MongoDB disconnected successfully');
+    console.log(MESSAGES.DB_DISCONNECTED);
   } catch (error) {
-    console.error('Error disconnecting from MongoDB:', error);
+    logger.error('Error disconnecting from MongoDB:', error);
   }
 };
 
@@ -42,7 +44,7 @@ const initAdmin = async () => {
     });
     console.log(`Admin user created with email: ${adminEmail}`);
   } else {
-    console.log('Admin user already exists');
+    console.log(MESSAGES_INFO.ADMIN_CREATED);
   }
 };
 
@@ -50,9 +52,7 @@ const initializeSeasons = async () => {
   const existingSeasons = await Season.find();
 
   if (existingSeasons.length === 0) {
-    console.log(
-      'No seasons found in the database. Initializing default seasons...',
-    );
+    console.log(MESSAGES_INFO.SEASONS_INIT);
 
     const seasons = [
       {
@@ -71,10 +71,10 @@ const initializeSeasons = async () => {
         periods: [
           {
             startDate: new Date('2025-03-01'),
-            endDate: new Date('2025-06-01'),
+            endDate: new Date('2025-05-31'),
           },
           {
-            startDate: new Date('2025-09-15'),
+            startDate: new Date('2025-09-16'),
             endDate: new Date('2025-10-31'),
           },
         ],
@@ -92,9 +92,9 @@ const initializeSeasons = async () => {
     ];
 
     await Season.insertMany(seasons);
-    console.log('Default seasons have been initialized.');
+    console.log(MESSAGES_INFO.SEASON_INIT_DONE);
   } else {
-    console.log('Seasons already exist in the database.');
+    console.log(MESSAGES_INFO.SEASONS_CREATED);
   }
 };
 
@@ -102,7 +102,7 @@ const initializeCars = async () => {
   const existingCars = await Car.find();
 
   if (existingCars.length === 0) {
-    console.log('No cars found in the database. Initializing default cars...');
+    console.log(MESSAGES_INFO.CARS_INIT);
 
     const cars = [
       {
@@ -148,8 +148,8 @@ const initializeCars = async () => {
     ];
 
     await Car.insertMany(cars);
-    console.log('Default cars have been initialized.');
+    console.log(MESSAGES_INFO.CARS_INIT_DONE);
   } else {
-    console.log('Cars already exist in the database.');
+    console.log(MESSAGES_INFO.CARS_CREATED);
   }
 };

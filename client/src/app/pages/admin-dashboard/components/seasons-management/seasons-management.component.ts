@@ -107,7 +107,10 @@ export class SeasonsManagementComponent implements OnInit {
 
   saveSeasons() {
     if (this.seasonsForm.valid) {
-      const updatedSeasons = this.seasonsForm.value.seasons;
+      const updatedSeasons: ISeasons[] = this.seasonsForm.value.seasons;
+      updatedSeasons.map(
+        (season) => (season.code = this.mappingCodeForSeason(season.name))
+      );
       this.adminService.updateSeasons(updatedSeasons).subscribe(() => {
         this.utilityService.showMessage(
           'success',
@@ -159,5 +162,17 @@ export class SeasonsManagementComponent implements OnInit {
 
       return null;
     };
+  }
+
+  mappingCodeForSeason(seasonName: string): string {
+    return (
+      seasonName
+        .toLowerCase()
+        .split(' ')
+        .map((word, index) =>
+          index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
+        )
+        .join('') + 'Price'
+    );
   }
 }

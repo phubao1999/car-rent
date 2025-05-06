@@ -1,5 +1,6 @@
-import { BookingRepository, CarRepository } from "../repositories";
-import { calculateTotalPrice } from "../utils/helper";
+import { MESSAGES_ERROR, MESSAGES_ERROR_VALIDATED } from '../constant';
+import { BookingRepository, CarRepository } from '../repositories';
+import { calculateTotalPrice } from '../utils/helper';
 
 export class BookingService {
   constructor(
@@ -22,20 +23,20 @@ export class BookingService {
     const end = new Date(endDate);
 
     if (start > end) {
-      throw { status: 400, message: 'Start date must be before end date.' };
+      throw { status: 400, message: MESSAGES_ERROR_VALIDATED.PERIOD_INVALID };
     }
 
     const licenseExpiry = new Date(drivingLicenseExpiry);
     if (licenseExpiry < end) {
       throw {
         status: 400,
-        message: 'Driving license must be valid through the booking period.',
+        message: MESSAGES_ERROR_VALIDATED.BOOKING_LICENSE_EXPIRY,
       };
     }
 
     const car = await this.carRepository.findById(carId);
     if (!car) {
-      throw { status: 404, message: 'Car not found.' };
+      throw { status: 404, message: MESSAGES_ERROR.CAR_NOT_FOUND };
     }
 
     const overlappingBookings =
@@ -44,7 +45,7 @@ export class BookingService {
     if (overlappingBookings >= car.stock) {
       throw {
         status: 400,
-        message: 'This car is fully booked for the selected dates.',
+        message: MESSAGES_ERROR.OVER_LAPPING_BOOKING,
       };
     }
 

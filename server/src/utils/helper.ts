@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { ICar, ISeason, Season } from '../models';
+import { ICar, IPeriod, ISeason, Season } from '../models';
 
 type ApiResponse = {
   status: number;
@@ -61,3 +61,14 @@ export const createBookingValidate = (req: Request): boolean => {
   }
   return true;
 };
+
+export const isValidSeason = (season: ISeason) =>
+  season.name &&
+  Array.isArray(season.periods) &&
+  season.periods.length > 0 &&
+  season.periods.every(
+    (period: IPeriod) =>
+      period.startDate &&
+      period.endDate &&
+      new Date(period.startDate) < new Date(period.endDate),
+  );

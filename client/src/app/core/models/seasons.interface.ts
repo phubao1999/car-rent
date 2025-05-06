@@ -5,5 +5,6 @@ export interface IPeriod {
 
 export interface ISeasons {
   name: string;
+  code: string;
   periods: IPeriod[];
 }

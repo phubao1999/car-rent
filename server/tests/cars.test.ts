@@ -1,5 +1,6 @@
 import request from 'supertest';
 import app from '../src/app';
+import { MESSAGES_ERROR, MESSAGES_ERROR_VALIDATED } from '../src/constant';
 import { connectDBForUT, disconnectDB } from '../src/utils/db.util';
 import {
   findAllMock,
@@ -138,7 +139,7 @@ describe('GET Car Available', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      message: 'Start date and end date are required.',
+      message: MESSAGES_ERROR_VALIDATED.AVAILABLE_CARS_PERIOD,
     });
   });
   it('should return 400 if startDate is after endDate', async () => {
@@ -148,7 +149,7 @@ describe('GET Car Available', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      message: 'Start date must be before end date.',
+      message: MESSAGES_ERROR_VALIDATED.PERIOD_INVALID,
     });
   });
 
@@ -161,7 +162,7 @@ describe('GET Car Available', () => {
 
     expect(response.status).toBe(500);
     expect(response.body).toEqual({
-      message: 'Failed to fetch available cars.',
+      message: MESSAGES_ERROR.GET_AVAILABLE_CARS,
     });
   });
 });
